@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
 
 // POST /api/gallery - Add gallery item (Admin Only)
 router.post('/', auth, admin, uploadSingle, handleUpload, async (req, res) => {
-  const { title } = req.body;
+  const { title, description } = req.body;
   const imageUrl = req.fileUrl; // From handleUpload middleware
 
   if (!title || !imageUrl) {
@@ -28,11 +28,37 @@ router.post('/', auth, admin, uploadSingle, handleUpload, async (req, res) => {
   try {
     const item = await dbHelper.create(Gallery, 'galleries', {
       title,
+      description: description || '',
       imageUrl
     });
     res.status(201).json(item);
   } catch (error) {
     console.error('Create gallery item error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// PUT /api/gallery/:id - Update gallery item (Admin Only)
+router.put('/:id', auth, admin, uploadSingle, handleUpload, async (req, res) => {
+  const { title, description } = req.body;
+
+  if (!title) {
+    return res.status(400).json({ error: 'Title is required' });
+  }
+
+  try {
+    const updateData = { title, description: description || '' };
+    if (req.fileUrl) {
+      updateData.imageUrl = req.fileUrl;
+    }
+
+    const updated = await dbHelper.findByIdAndUpdate(Gallery, 'galleries', req.params.id, updateData);
+    if (!updated) {
+      return res.status(404).json({ error: 'Gallery item not found' });
+    }
+    res.json(updated);
+  } catch (error) {
+    console.error('Update gallery item error:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
