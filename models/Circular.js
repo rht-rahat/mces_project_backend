@@ -13,6 +13,10 @@ const CircularSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  description: {
+    type: String,
+    default: ''
+  },
   salaryRange: {
     type: String,
     required: true

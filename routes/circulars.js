@@ -38,7 +38,7 @@ router.get('/:id', async (req, res) => {
 
 // POST /api/circulars - Create circular (Admin Only)
 router.post('/', auth, admin, uploadSingle, handleUpload, async (req, res) => {
-  const { title, country, jobCategory, salaryRange, requirements } = req.body;
+  const { title, country, jobCategory, description, salaryRange, requirements } = req.body;
   const imageUrl = req.fileUrl;
 
   if (!title || !country || !jobCategory || !salaryRange || !imageUrl) {
@@ -59,6 +59,7 @@ router.post('/', auth, admin, uploadSingle, handleUpload, async (req, res) => {
       title,
       country,
       jobCategory,
+      description: description || '',
       salaryRange,
       requirements: requirementsArray,
       imageUrl
@@ -72,12 +73,13 @@ router.post('/', auth, admin, uploadSingle, handleUpload, async (req, res) => {
 
 // PUT /api/circulars/:id - Update circular (Admin Only)
 router.put('/:id', auth, admin, uploadSingle, handleUpload, async (req, res) => {
-  const { title, country, jobCategory, salaryRange, requirements } = req.body;
+  const { title, country, jobCategory, description, salaryRange, requirements } = req.body;
   const updateFields = {};
 
   if (title) updateFields.title = title;
   if (country) updateFields.country = country;
   if (jobCategory) updateFields.jobCategory = jobCategory;
+  if (description !== undefined) updateFields.description = description;
   if (salaryRange) updateFields.salaryRange = salaryRange;
   if (req.fileUrl) updateFields.imageUrl = req.fileUrl;
 
